@@ -19,3 +19,13 @@ class Card(object):
             if trial.isdigit() == False:
                 colors.add(trial)
         self.colors = list(colors)
+    
+    def download(self, dest = None):
+        if dest is None:
+            dest = self.title.replace(" ","") + ".jpg"
+        res = requests.get(self.imgurl)
+        res.raise_for_status()
+        savefile = open(dest, 'wb')
+        for chunk in res:
+            savefile.write(chunk)
+        savefile.close()
