@@ -11,4 +11,11 @@ class Card(object):
         self.title = self.soup.select('div[class="contentTitle"]')[0].text.strip()
         self.imgurl = "http://gatherer.wizards.com/" + \
         self.soup.select('img[id="ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_cardImage"]')[0].get('src').strip("../../")
-        
+        colors = set()
+        manarow = self.soup.select('div[id="ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_manaRow"]')
+        manaimgs = manarow[0].select('img[alt]')
+        for m in manaimgs:
+            trial = m.get('alt').lower()
+            if trial.isdigit() == False:
+                colors.add(trial)
+        self.colors = list(colors)
