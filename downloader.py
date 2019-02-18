@@ -1,4 +1,5 @@
-import requests, bs4
+import requests, bs4, cv2, tempfile
+import numpy as np
 
 randURL = "http://gatherer.wizards.com/Pages/Card/Details.aspx?action=random"
 
@@ -29,3 +30,22 @@ class Card(object):
         for chunk in res:
             savefile.write(chunk)
         savefile.close()
+    
+    def download_image(self, dest = None):
+        if dest is None:
+            dest = self.title.replace(" ","") + ".jpg"
+        tempdir = tempfile.TemporaryDirectory()
+        tempdest = tempdir.name + "/" + self.title.replace(" ","") + ".jpg"
+        self.download(tempdest)
+        img = cv2.imread(tempdest)
+        h,w,_ = img.shape
+        left = round(0.09*w)
+        top = round(0.125*h)
+        right = round(0.905*w)
+        bottom = round(0.5484*h)
+        newimg = np.zeros((bottom - top, right - left, 3))
+        for i in range(left, right):
+            for j in range(top, bottom):
+                newimg[j-top, i-left, :] = img[j, i, :]
+        cv2.imwrite(dest, newimg)
+        tempdir.cleanup()
